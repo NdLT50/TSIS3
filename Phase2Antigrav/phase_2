@@ -1,0 +1,235 @@
+Phase 2 — SDD Workflow & Required Artifacts
+
+Based on the approved SSOT, the following implementation artifacts were derived before final code development. These artifacts define the structure of the application and the verification approach for the pricing logic.
+2.1 Artifact 1 — Implementation Plan
+2.1.1 Development Objective
+The purpose of the implementation plan is to translate the SSOT into a working Angular single-page application that calculates monthly cloud costs for a chatbot system and can be deployed through Firebase Hosting.
+2.1.2 Application Structure
+
+The application is organized into the following logical components:
+ChatShellComponent — main layout container for the calculator interface
+InputFormComponent — collects all usage assumptions from the user
+ResultsPanelComponent — displays the cost breakdown and total monthly cost
+PricingEngineService — implements all pricing formulas defined in the SSOT
+Validation Layer — ensures all user inputs satisfy the rules defined in the specification
+
+2.1.3 Component Responsibilities
+ChatShellComponent
+Acts as the main page container. It arranges the header, calculator form, and results panel.
+InputFormComponent
+Contains the full calculator form. It captures all required parameters:
+Monthly Users
+Messages per User per Month
+Average Input Tokens per Message
+Average Output Tokens per Message
+Monthly Function Invocations
+Execution Time per Invocation
+Memory Allocation
+Database Storage
+Monthly Document Writes
+Cloud Storage Usage
+Gemini model selection
+ResultsPanelComponent
+Receives the calculated results and displays:
+Compute Cost
+LLM Inference Cost
+Firestore Cost
+Cloud Storage Cost
+Total Monthly Cost
+PricingEngineService
+Implements all mathematical formulas from the SSOT as pure calculation functions. This service must not contain UI logic.
+
+2.1.4 Calculation Workflow
+The application must follow this sequence:
+The user enters usage data in the input form.
+The validation layer checks whether all required values are valid.
+If validation passes, the input values are passed to the PricingEngineService.
+The PricingEngineService computes all intermediate metrics and cost components.
+The total monthly cost is calculated.
+The ResultsPanelComponent displays the final breakdown.
+
+2.1.5 Formula Mapping
+Compute Cost
+Convert execution time from milliseconds to seconds
+Compute GB-seconds
+Compute invocation cost
+Compute runtime cost
+Sum both values
+LLM Cost
+Compute total messages
+Compute total input tokens
+Compute total output tokens
+Select Gemini pricing tier
+Compute input token cost
+Compute output token cost
+Sum both values
+Firestore Cost
+Compute storage cost
+Compute write operations cost
+Sum both values
+Cloud Storage Cost
+Multiply storage usage by fixed monthly GB rate
+Total Monthly Cost
+Sum Compute, LLM, Firestore, and Cloud Storage costs
+
+2.1.6 Repository Structure
+The implementation should follow a clean modular structure such as:
+
+src/
+  app/
+    components/
+      chat-shell/
+      input-form/
+      results-panel/
+    services/
+      pricing-engine.service.ts
+    app.component.ts
+    app.module.ts
+
+
+2.1.7 UI Plan
+The user interface must include:
+a header section with project title and description
+a structured calculator form
+a calculate button
+a results dashboard showing each cost component
+a visually emphasized total monthly cost
+The layout should be responsive and suitable for desktop presentation.
+
+2.1.8 Deployment Plan
+After local testing, the application will be built using Angular production build tools and deployed via Firebase Hosting.
+Deployment steps:
+Build the Angular application
+Configure Firebase Hosting
+Set the Angular build output directory as the hosting public directory
+Deploy the application
+Verify that the public Firebase URL is accessible and working
+
+2.2 Artifact 2 — Test Specification Suite
+The purpose of the test specification suite is to verify that every pricing formula defined in the SSOT is implemented correctly and produces deterministic results.
+
+2.2.1 Validation Tests
+
+Test V1 — Reject Negative Values
+Input contains one or more negative numeric values.
+Expected result: calculation is blocked and a validation error is shown.
+
+Test V2 — Reject Memory Below 128 MB
+Memory allocation is below 128 MB.
+Expected result: calculation is blocked and a validation error is shown.
+
+Test V3 — Reject Empty Required Fields
+One or more required inputs are missing.
+Expected result: calculation is blocked and the user is prompted to complete the form.
+
+2.2.2 Formula Tests
+Test Case 1 — Normal Usage / Gemini Flash
+
+Inputs
+Monthly Users = 1000
+Messages per User per Month = 20
+Avg Input Tokens per Message = 150
+Avg Output Tokens per Message = 300
+Monthly Function Invocations = 20000
+Execution Time per Invocation = 500 ms
+Memory Allocation = 256 MB
+Database Storage = 5 GB
+Monthly Document Writes = 50000
+Cloud Storage Usage = 10 GB
+Model = Gemini 1.5 Flash
+Expected Calculation
+TotalMessages = 1000 × 20 = 20000
+TotalInputTokens = 20000 × 150 = 3,000,000
+TotalOutputTokens = 20000 × 300 = 6,000,000
+LLM Input Cost = 3,000,000 / 1,000,000 × 0.075 = 0.225
+LLM Output Cost = 6,000,000 / 1,000,000 × 0.30 = 1.80
+LLM Cost = 2.025
+ExecutionTimeSeconds = 500 / 1000 = 0.5
+GBSeconds = (256 / 1024) × 0.5 × 20000 = 2500
+Invocation Cost = 20000 / 1,000,000 × 0.40 = 0.008
+Runtime Cost = 2500 × 0.0000025 = 0.00625
+Compute Cost = 0.01425
+Firestore Storage Cost = 5 × 0.18 = 0.90
+Firestore Write Cost = 50000 / 100000 × 0.06 = 0.03
+Firestore Cost = 0.93
+Cloud Storage Cost = 10 × 0.02 = 0.20
+Expected TotalMonthlyCost
+0.01425 + 2.025 + 0.93 + 0.20 = 3.16925 USD
+Expected displayed total: $3.17
+Test Case 2 — Normal Usage / Gemini Pro
+
+Inputs
+Same as Test Case 1, but Model = Gemini 1.5 Pro
+Expected Calculation
+LLM Input Cost = 3,000,000 / 1,000,000 × 3.50 = 10.50
+LLM Output Cost = 6,000,000 / 1,000,000 × 10.50 = 63.00
+LLM Cost = 73.50
+Compute Cost = 0.01425
+Firestore Cost = 0.93
+Cloud Storage Cost = 0.20
+Expected TotalMonthlyCost
+73.50 + 0.01425 + 0.93 + 0.20 = 74.64425 USD
+Expected displayed total: $74.64
+Test Case 3 — Zero Usage Scenario
+
+Inputs
+Monthly Users = 0
+Messages per User per Month = 0
+Avg Input Tokens per Message = 0
+Avg Output Tokens per Message = 0
+Monthly Function Invocations = 0
+Execution Time per Invocation = 0
+Memory Allocation = 128 MB
+Database Storage = 0 GB
+Monthly Document Writes = 0
+Cloud Storage Usage = 0 GB
+Model = Gemini 1.5 Flash
+Expected Result
+Compute Cost = 0
+LLM Cost = 0
+Firestore Cost = 0
+Cloud Storage Cost = 0
+TotalMonthlyCost = $0.00
+
+Test Case 4 — High Usage Scenario
+Inputs
+Monthly Users = 100000
+Messages per User per Month = 30
+Avg Input Tokens per Message = 250
+Avg Output Tokens per Message = 500
+Monthly Function Invocations = 3000000
+Execution Time per Invocation = 700 ms
+Memory Allocation = 512 MB
+Database Storage = 100 GB
+Monthly Document Writes = 3000000
+Cloud Storage Usage = 250 GB
+Model = Gemini 1.5 Flash
+
+Expected Behavior
+The application must calculate all values successfully
+The UI must remain responsive
+No overflow, crash, or invalid number formatting may occur
+
+Test Case 5 — Invalid Input Scenario
+Inputs
+Monthly Users = -50
+Memory Allocation = 64 MB
+Expected Result
+Calculation does not execute
+Validation message is displayed
+No result panel is rendered with costs
+
+
+2.2.3 Acceptance Criteria
+Phase 2 is considered complete if:
+the implementation plan clearly maps the SSOT into components, services, and deployment steps
+the test specification suite covers validation, normal usage, zero usage, and high usage scenarios
+all formulas are directly traceable to the SSOT
+the generated implementation can be verified before deployment
+
+2.3 Phase 2 Deliverables
+The final deliverables for Phase 2 are:
+Implementation Plan
+Test Specification Suite
+
+These artifacts serve as the bridge between the SSOT and the final Angular implementation deployed in Phase 3.
