@@ -1,0 +1,49 @@
+<div class="container">
+  <h1>GCP CFO Bot (Angular)</h1>
+
+  <div class="panel" [formGroup]="calcForm">
+    <h3>LLM Usage</h3>
+    <div class="grid">
+      <div class="field">
+        <label>Monthly Users</label>
+        <input type="number" formControlName="users">
+        <small class="err" *ngIf="calcForm.get('users')?.invalid">Required (min 0)</small>
+      </div>
+      <div class="field">
+        <label>Model</label>
+        <select formControlName="model">
+          <option value="flash">Gemini 1.5 Flash</option>
+          <option value="pro">Gemini 1.5 Pro</option>
+        </select>
+      </div>
+      </div>
+  </div>
+
+  <button class="calc-btn" [disabled]="calcForm.invalid" (click)="updateResults()">
+    CALCULATE COST
+  </button>
+
+  <div class="panel results" *ngIf="results">
+    <h2>Total: ${{ results.total | number:'1.2-2' }} / mo</h2>
+    <div class="bar-chart">
+      <div class="bar compute" [style.width.%]="(results.compute.total / results.total) * 100"></div>
+      <div class="bar llm" [style.width.%]="(results.llm.total / results.total) * 100"></div>
+    </div>
+    
+    <div class="breakdown">
+      <p>Compute: ${{ results.compute.total | number:'1.4' }}</p>
+      <p>LLM: ${{ results.llm.total | number:'1.4' }}</p>
+    </div>
+  </div>
+
+  <div class="panel chat">
+    <div class="messages">
+      <div *ngFor="let m of chat" [className]="'msg ' + m.role">
+        <b>{{ m.role }}:</b> {{ m.text }}
+      </div>
+    </div>
+    <div class="chat-input">
+      <input #chatBtn (keyup.enter)="askGemini(chatBtn.value); chatBtn.value=''" placeholder="Ask CFO Bot...">
+    </div>
+  </div>
+</div>

@@ -1,0 +1,82 @@
+<form [formGroup]="costForm" (ngSubmit)="onSubmit()" class="cost-form">
+      <div class="form-grid">
+        <label class="field field-full">
+          <span class="field-label">Model</span>
+          <select formControlName="model">
+            <option value="flash">Gemini 1.5 Flash</option>
+            <option value="pro">Gemini 1.5 Pro</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span class="field-label">Monthly Users</span>
+          <input type="number" formControlName="monthlyUsers" placeholder="1000">
+          <small *ngIf="showError('monthlyUsers')">Enter 0 or more</small>
+        </label>
+
+        <label class="field">
+          <span class="field-label">Messages per User</span>
+          <input type="number" formControlName="messagesPerUser" placeholder="24">
+          <small *ngIf="showError('messagesPerUser')">Enter 0 or more</small>
+        </label>
+
+        <label class="field">
+          <span class="field-label">Avg Input Tokens</span>
+          <input type="number" formControlName="avgInputTokens" placeholder="800">
+          <small *ngIf="showError('avgInputTokens')">Enter 0 or more</small>
+        </label>
+
+        <label class="field">
+          <span class="field-label">Avg Output Tokens</span>
+          <input type="number" formControlName="avgOutputTokens" placeholder="400">
+          <small *ngIf="showError('avgOutputTokens')">Enter 0 or more</small>
+        </label>
+
+        <label class="field">
+          <span class="field-label">Function Invocations</span>
+          <input type="number" formControlName="invocations" placeholder="50000">
+          <small *ngIf="showError('invocations')">Enter 0 or more</small>
+        </label>
+
+        <label class="field">
+          <span class="field-label">Execution Time (ms)</span>
+          <input type="number" formControlName="executionTimeMs" placeholder="350">
+          <small *ngIf="showError('executionTimeMs')">Enter 0 or more</small>
+        </label>
+
+        <label class="field">
+          <span class="field-label">Memory (MB)</span>
+          <input type="number" formControlName="memoryMb" placeholder="256">
+          <small *ngIf="showError('memoryMb')">Minimum 128 MB</small>
+        </label>
+
+        <label class="field">
+          <span class="field-label">DB Storage (GB)</span>
+          <input type="number" formControlName="dbStorageGb" placeholder="10">
+          <small *ngIf="showError('dbStorageGb')">Enter 0 or more</small>
+        </label>
+
+        <label class="field">
+          <span class="field-label">Document Writes</span>
+          <input type="number" formControlName="documentWrites" placeholder="250000">
+          <small *ngIf="showError('documentWrites')">Enter 0 or more</small>
+        </label>
+
+        <label class="field field-full">
+          <span class="field-label">Cloud Storage (GB)</span>
+          <input type="number" formControlName="cloudStorageGb" placeholder="50">
+          <small *ngIf="showError('cloudStorageGb')">Enter 0 or more</small>
+        </label>
+      </div>
+
+      <div class="quick-note">
+        <div>
+          <strong>Tip:</strong>
+          Use realistic monthly traffic values to get a more useful estimate.
+        </div>
+      </div>
+
+      <button type="submit" [disabled]="costForm.invalid" class="submit-btn">
+        Calculate Monthly Cost
+      </button>
+    </form>

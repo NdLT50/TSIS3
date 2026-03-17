@@ -1,0 +1,84 @@
+<div class="results-wrap">
+      <ng-container *ngIf="results; else emptyState">
+        <div class="summary-card">
+          <p class="mini-label">Estimated monthly total</p>
+          <h2>{{ results.totalCost | currency:'USD':'symbol':'1.2-2' }}</h2>
+
+          <div class="progress-card">
+            <div class="progress-row">
+              <span>Compute</span>
+              <strong>{{ getPercent(results.computeCost) }}%</strong>
+            </div>
+            <div class="progress">
+              <div class="progress-fill compute" [style.width.%]="getPercent(results.computeCost)"></div>
+            </div>
+
+            <div class="progress-row">
+              <span>LLM</span>
+              <strong>{{ getPercent(results.llmCost) }}%</strong>
+            </div>
+            <div class="progress">
+              <div class="progress-fill llm" [style.width.%]="getPercent(results.llmCost)"></div>
+            </div>
+
+            <div class="progress-row">
+              <span>Firestore</span>
+              <strong>{{ getPercent(results.firestoreCost) }}%</strong>
+            </div>
+            <div class="progress">
+              <div class="progress-fill db" [style.width.%]="getPercent(results.firestoreCost)"></div>
+            </div>
+
+            <div class="progress-row">
+              <span>Storage</span>
+              <strong>{{ getPercent(results.storageCost) }}%</strong>
+            </div>
+            <div class="progress">
+              <div class="progress-fill storage" [style.width.%]="getPercent(results.storageCost)"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="breakdown-card">
+          <div class="breakdown-row">
+            <div>
+              <span class="row-label">Compute Cost</span>
+              <p>Cloud Functions execution estimate</p>
+            </div>
+            <strong>{{ results.computeCost | currency:'USD':'symbol':'1.2-4' }}</strong>
+          </div>
+
+          <div class="breakdown-row">
+            <div>
+              <span class="row-label">LLM Inference</span>
+              <p>Gemini token-based usage</p>
+            </div>
+            <strong>{{ results.llmCost | currency:'USD':'symbol':'1.2-2' }}</strong>
+          </div>
+
+          <div class="breakdown-row">
+            <div>
+              <span class="row-label">Firestore</span>
+              <p>Storage and document writes</p>
+            </div>
+            <strong>{{ results.firestoreCost | currency:'USD':'symbol':'1.2-2' }}</strong>
+          </div>
+
+          <div class="breakdown-row">
+            <div>
+              <span class="row-label">Cloud Storage</span>
+              <p>File storage estimate</p>
+            </div>
+            <strong>{{ results.storageCost | currency:'USD':'symbol':'1.2-2' }}</strong>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-template #emptyState>
+        <div class="empty-card">
+          <div class="empty-icon">↗</div>
+          <h3>No estimate yet</h3>
+          <p>Fill in the form and press calculate to generate a polished monthly cost breakdown.</p>
+        </div>
+      </ng-template>
+    </div>

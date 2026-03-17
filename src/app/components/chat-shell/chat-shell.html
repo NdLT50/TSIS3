@@ -1,0 +1,64 @@
+<div class="page-shell">
+      <div class="bg-orb orb-1"></div>
+      <div class="bg-orb orb-2"></div>
+      <div class="bg-grid"></div>
+
+      <main class="dashboard">
+        <section class="hero-card">
+          <div class="hero-badge">AI Cost Estimator</div>
+
+          <div class="hero-content">
+            <div>
+              <h1>CFO Bot Calculator</h1>
+              <p class="hero-text">
+                Estimate monthly Google Cloud and Gemini usage costs with a modern CFO-style dashboard.
+              </p>
+
+              <div class="hero-stats">
+                <div class="stat-chip">
+                  <span class="stat-label">Mode</span>
+                  <strong>Forecast</strong>
+                </div>
+                <div class="stat-chip">
+                  <span class="stat-label">Provider</span>
+                  <strong>Google Cloud</strong>
+                </div>
+                <div class="stat-chip">
+                  <span class="stat-label">Focus</span>
+                  <strong>LLM + Infra</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="hero-side">
+              <div class="hero-mini-card">
+                <span>Decision Ready</span>
+                <strong>{{ results ? 'Updated' : 'Waiting for input' }}</strong>
+              </div>
+              <div class="hero-mini-card">
+                <span>Last estimate</span>
+                <strong>{{ results ? (results.totalCost | currency:'USD':'symbol':'1.2-2') : '$0.00' }}</strong>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="content-grid">
+          <div class="left-panel glass-card">
+            <div class="section-head">
+              <div>
+                <p class="eyebrow">Input parameters</p>
+                <h2>Usage configuration</h2>
+              </div>
+              <span class="section-pill">Live form</span>
+            </div>
+
+            <app-input-form (calculate)="onCalculate($event)"></app-input-form>
+          </div>
+
+          <div class="right-panel">
+            <app-results-panel [results]="results"></app-results-panel>
+          </div>
+        </section>
+      </main>
+    </div>
